@@ -1,14 +1,15 @@
 import React from 'react'
 import { BackgroundForAAccount } from '../components/BackgroundForAAccount'
-import LoginForm from '../components/LoginForm'
+import SignupForm from '../components/SignupForm'
 
-const Login = () => {
+const Signup = () => {
   return (
-    <div className='w-full min-h-screen bottom-0 bg-black fadeIn'>
+    <div className='w-full h-screen fadeIn '>
       <BackgroundForAAccount>
-        <LoginForm />
+        <SignupForm />
       </BackgroundForAAccount>
     </div>
   )
 }
-export default Login
+
+export default Signup
