@@ -1,41 +1,79 @@
 import React from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import { Link } from 'react-router-dom';
 
 const UserDashboard = () => {
     const { user, logout } = useAuth();
-    const navigate = useNavigate();
 
     return (
-        <div className="min-h-screen bg-black text-white p-8 font-sans">
-            <nav className="flex justify-between items-center mb-10 border-b border-zinc-800 pb-4">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent italic tracking-wider">
-                    User Dashboard
-                </h1>
+        <div className="min-h-screen bg-black font-sans">
+            {}
+            <nav className="h-16 border-b border-zinc-800 flex items-center justify-between px-8 bg-black">
+                <div className="text-white uppercase text-sm font-bold flex items-center gap-10">
+                    <Link to="/" className='text-yellow-100'>Home</Link>
+                    User's Dashboard
+                </div>
+
                 <div className="flex items-center gap-6">
-                    <span className="text-zinc-400 text-sm font-medium tracking-wide">
-                        Welcome, <span className="text-green-400">{user?.name}</span>
+                    <span className="text-xs text-zinc-500 font-medium">
+                        <span className="text-white uppercase">{user?.name}</span>
                     </span>
                     <button
                         onClick={logout}
-                        className="bg-zinc-900 hover:bg-zinc-800 text-white px-5 py-2 rounded border border-zinc-700 hover:border-green-500/50 transition-all duration-300 text-sm font-medium"
+                        className="bg-white text-black text-xs font-bold px-4 py-1.5 rounded hover:bg-zinc-200 transition-colors uppercase"
                     >
                         Logout
                     </button>
                 </div>
             </nav>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div className="bg-zinc-900/50 p-6 rounded border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-900 transition-all cursor-pointer group duration-300">
-                    <h3 className="text-xl font-semibold mb-2 text-zinc-100 group-hover:text-green-400 transition-colors">My Profile</h3>
-                    <p className="text-zinc-500 group-hover:text-zinc-400 transition-colors">View and edit your profile details.</p>
+
+            <div className="w-full h-[calc(100vh-4rem)] flex justify-center items-center bg-gradient-to-br from-black via-[#051a0e] to-black animate-gradient">
+
+                <div className="w-[720px] max-w-[90%] bg-black rounded-2xl border border-white/5 shadow-[0_0_40px_rgba(0,0,0,0.6)] p-8">
+
+                    {}
+                    <div className="mb-8">
+                        <h2 className="text-white text-lg font-semibold tracking-wide">Profile</h2>
+                        <p className="text-gray-500 text-sm mt-1">Basic account information</p>
+                    </div>
+
+                    {}
+                    <div className="divide-y divide-white/10">
+
+                        <div className="flex items-center justify-between py-4">
+                            <span className="text-gray-400 text-sm">Username</span>
+                            <span className="text-white text-sm font-medium">{user?.name}</span>
+                        </div>
+
+                        <div className="flex items-center justify-between py-4">
+                            <span className="text-gray-400 text-sm">Email</span>
+                            <span className="text-white text-sm font-medium text-right max-w-[60%] break-all">
+                                {user?.email}
+                            </span>
+                        </div>
+
+                        <div className="flex items-center justify-between py-4">
+                            <span className="text-gray-400 text-sm">Role</span>
+                            <span className="text-white text-sm font-medium">{user?.role}</span>
+                        </div>
+
+                    </div>
+
+                    {}
+                    <div className="mt-8 pt-6 border-t border-white/10">
+                        <p className="text-xs text-gray-500 mb-2">Token</p>
+                        <p className="text-xs text-gray-400 break-all leading-relaxed">
+                            {localStorage.getItem("token")}
+                        </p>
+                    </div>
+
                 </div>
-                <div className="bg-zinc-900/50 p-6 rounded border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-900 transition-all cursor-pointer group duration-300">
-                    <h3 className="text-xl font-semibold mb-2 text-zinc-100 group-hover:text-green-400 transition-colors">My Activities</h3>
-                    <p className="text-zinc-500 group-hover:text-zinc-400 transition-colors">Check your recent activities.</p>
-                </div>
+
             </div>
-        </div>
+
+
+        </div >
     );
 };
 
