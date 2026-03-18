@@ -17,7 +17,7 @@ const HeroPage = () => {
 
 
                 <div className="w-[89vw] h-[40vw] bg-black mt-20 rounded-2xl ">
-                    <img src={desktop} alt="" className="w-full h-full rounded-2xl" />
+                    <img src={desktop} alt="System Architecture Overview" className="w-full h-full rounded-2xl" />
                 </div>
             </div>
 
