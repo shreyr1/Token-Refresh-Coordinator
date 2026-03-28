@@ -1,7 +1,7 @@
 import userModel from "../models/user.model.js"
 
 export const createUser = async(
-    {name, email , password}
+    {name, email, password, role}
 ) => {
     if(!name){
         throw new Error('Please Enter your name')
@@ -12,11 +12,11 @@ export const createUser = async(
 
     const hashedPassword = await userModel.hashPassword(password);
 
-
     const user = await userModel.create({
         name,
         email,
-        password : hashedPassword
+        password : hashedPassword,
+        role
     })
 
     return user;

@@ -7,6 +7,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import UserDashboard from "./pages/UserDashboard";
 import { AuthProvider, useAuth } from "./context/AuthContext";
 import { Toaster } from "react-hot-toast";
+import SmoothScroll from "./components/SmoothScroll";
 
 const ProtectedRoute = ({ children, role }) => {
   const { user, loading } = useAuth();
@@ -25,6 +26,7 @@ const AppContent = () => {
     { path: "/", element: <Home /> },
     { path: "/login", element: <Login /> },
     { path: "/signup", element: <Signup /> },
+    
     {
       path: "/admin",
       element: (
@@ -49,10 +51,12 @@ const AppContent = () => {
 const App = () => {
   return (
     <AuthProvider>
-      <main className="">
-        <AppContent />
-        <Toaster position="top-center" />
-      </main>
+      <SmoothScroll>
+        <main className="">
+          <AppContent />
+          <Toaster position="top-center" />
+        </main>
+      </SmoothScroll>
     </AuthProvider>
   );
 };

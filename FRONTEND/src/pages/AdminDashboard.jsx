@@ -1,44 +1,110 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
-import { useNavigate } from 'react-router-dom';
+import axios from 'axios';
+import { toast } from 'react-hot-toast';
+import { Link } from 'react-router-dom'
 
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
-    const navigate = useNavigate();
+    const [users, setUsers] = useState([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchAllUsers = async () => {
+            try {
+                const token = localStorage.getItem("token");
+                const res = await axios.get("http://localhost:5000/users/all-users", {
+                    headers: { Authorization: `Bearer ${token}` }
+                });
+                setUsers(res.data.users);
+            } catch (error) {
+                console.error(error);
+                toast.error("Failed to fetch user database");
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchAllUsers();
+    }, []);
 
     return (
-        <div className="min-h-screen bg-black text-white p-8 font-sans">
-            <nav className="flex justify-between items-center mb-10 border-b border-zinc-800 pb-4">
-                <h1 className="text-3xl font-bold bg-gradient-to-r from-green-400 to-emerald-600 bg-clip-text text-transparent italic tracking-wider">
-                    Admin Dashboard
-                </h1>
+        <div className="min-h-screen bg-[#0d0d0d] text-[#ececec] font-sans">
+            <nav className="h-16 border-b border-zinc-800 flex items-center justify-between px-8 bg-black">
+                <div className='text-white uppercase text-sm font-bold flex items-center gap-10'>
+                <Link to="/" className='text-yellow-100'>Home</Link>
+                <span className='text-white text-sm font-bold'>ADMIN DASHBOARD</span>
+
+                </div>
                 <div className="flex items-center gap-6">
-                    <span className="text-zinc-400 text-sm font-medium tracking-wide">
-                        Welcome, <span className="text-green-400">{user?.name}</span> (Admin)
+                    <span className="text-xs text-zinc-500 font-medium tracking-widest uppercase">
+                        Admin: <span className="text-emerald-400">{user?.name}</span>
                     </span>
                     <button
                         onClick={logout}
-                        className="bg-zinc-900 hover:bg-zinc-800 text-white px-5 py-2 rounded border border-zinc-700 hover:border-green-500/50 transition-all duration-300 text-sm font-medium"
+                        className="bg-white text-black text-xs font-bold px-4 py-1.5 rounded hover:bg-zinc-200 transition-colors uppercase"
                     >
                         Logout
                     </button>
                 </div>
             </nav>
 
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div className="bg-zinc-900/50 p-6 rounded border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-900 transition-all cursor-pointer group duration-300">
-                    <h3 className="text-xl font-semibold mb-2 text-zinc-100 group-hover:text-green-400 transition-colors">User Management</h3>
-                    <p className="text-zinc-500 group-hover:text-zinc-400 transition-colors">Manage all registered users.</p>
+            <main className="p-10 max-w-7xl mx-auto">
+                <header className="mb-12">
+                    <h1 className="text-4xl font-bold text-white mb-2 tracking-tight">User Database</h1>
+                    <p className="text-zinc-500 text-sm">Manage and monitor all registered accounts within the system.</p>
+                </header>
+
+                <div className="bg-[#141414] border border-zinc-800 overflow-hidden ">
+                    <div className="overflow-x-auto">
+                        <table className="w-full text-left border-collapse">
+                            <thead>
+                                <tr className="bg-black/40 border-b border-zinc-800">
+                                    <th className="px-6 py-4 text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">Username</th>
+                                    <th className="px-6 py-4 text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">Email Address</th>
+                                    <th className="px-6 py-4 text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">Role</th>
+                                    <th className="px-6 py-4 text-[10px] text-zinc-500 font-bold uppercase tracking-[0.2em]">Account ID</th>
+                                </tr>
+                            </thead>
+                            <tbody className="divide-y divide-zinc-800/50">
+                                {loading ? (
+                                    <tr>
+                                        <td colSpan="4" className="px-6 py-10 text-center text-zinc-600 italic">Initializing database link...</td>
+                                    </tr>
+                                ) : users.length === 0 ? (
+                                    <tr>
+                                        <td colSpan="4" className="px-6 py-10 text-center text-zinc-600 italic">No registered users found.</td>
+                                    </tr>
+                                ) : (
+                                    users.map((u) => (
+                                        <tr key={u._id} className="hover:bg-zinc-800/30 transition-colors group">
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm font-medium text-white group-hover:text-emerald-400 transition-colors">{u.name}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-sm text-zinc-400 font-mono tracking-tight">{u.email}</span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className={`inline-block px-2 py-0.5 rounded text-[10px] font-bold  ${u.role === 'Admin' ? 'text-lime-400' : 'text-zinc-400 '
+                                                    }`}>
+                                                    {u.role || 'USER'}
+                                                </span>
+                                            </td>
+                                            <td className="px-6 py-4">
+                                                <span className="text-[10px] text-zinc-600 font-mono select-none">{u._id}</span>
+                                            </td>
+                                        </tr>
+                                    ))
+                                )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-                <div className="bg-zinc-900/50 p-6 rounded border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-900 transition-all cursor-pointer group duration-300">
-                    <h3 className="text-xl font-semibold mb-2 text-zinc-100 group-hover:text-green-400 transition-colors">System Settings</h3>
-                    <p className="text-zinc-500 group-hover:text-zinc-400 transition-colors">Configure application settings.</p>
-                </div>
-                <div className="bg-zinc-900/50 p-6 rounded border border-zinc-800 hover:border-green-500/50 hover:bg-zinc-900 transition-all cursor-pointer group duration-300">
-                    <h3 className="text-xl font-semibold mb-2 text-zinc-100 group-hover:text-green-400 transition-colors">Analytics</h3>
-                    <p className="text-zinc-500 group-hover:text-zinc-400 transition-colors">View system performance.</p>
-                </div>
-            </div>
+
+                <footer className="mt-8 flex items-center justify-between text-[10px] text-white uppercase tracking-widest font-bold">
+        
+                    <div className=''>Total Records: {users.length}</div>
+                </footer>
+            </main>
         </div>
     );
 };

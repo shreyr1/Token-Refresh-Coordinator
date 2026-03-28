@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 
 const AuthContext = createContext();
 
-const API_URL = "http://localhost:4000/api/v1";
+const API_URL = "http://localhost:5000/users";
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -23,11 +23,13 @@ export const AuthProvider = ({ children }) => {
     const login = async (email, password) => {
         try {
             const res = await axios.post(`${API_URL}/login`, { email, password });
-            if (res.data.success) {
+            if (res.data) {
                 toast.success("Login Successful");
                 setUser(res.data.user);
                 localStorage.setItem("user", JSON.stringify(res.data.user));
                 localStorage.setItem("token", res.data.token);
+                
+                
                 if (res.data.user.role === "Admin") {
                     navigate("/admin");
                 } else {
@@ -37,22 +39,22 @@ export const AuthProvider = ({ children }) => {
             }
         } catch (error) {
             console.error(error);
-            toast.error(error.response?.data?.message || "Login Failed");
+            toast.error(error.response?.data?.errors?.[0]?.msg || error.response?.data?.error || "Login Failed");
             return false;
         }
     };
 
     const signup = async (name, email, password, role) => {
         try {
-            const res = await axios.post(`${API_URL}/signup`, { name, email, password, role });
-            if (res.data.success) {
+            const res = await axios.post(`${API_URL}/register`, { name, email, password, role });
+            if (res.data) {
                 toast.success("Signup Successful. Please Login.");
                 navigate("/login");
                 return true;
             }
         } catch (error) {
             console.error(error);
-            toast.error(error.response?.data?.message || "Signup Failed");
+            toast.error(error.response?.data?.errors?.[0]?.msg || error.response?.data?.error || "Signup Failed");
             return false;
         }
     };
