@@ -21,6 +21,6 @@ router.post('/refresh', userController.refreshTokenController);
 router.post('/logout', authentication.authUser, userController.logoutController);
 
 router.get('/dashboard', authentication.authUser ,userController.getUserInfo);
-
+router.get('/all-users', authentication.authUser, userController.getAllUsersController);
 
 export default router;
