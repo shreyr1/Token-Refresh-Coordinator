@@ -13,7 +13,7 @@ const HeroPage = () => {
                     <br />
                     Token Generation</span>
 
-                <p className="text-sm text-zinc-200 font-medium capitalize italic">A Sceured Platform that provide AuthN & AuthZ Solution with token generation and token regershment as Solution</p>
+                <p className="text-sm text-zinc-200 font-medium capitalize italic">A Secure Platform that provide AuthN & AuthZ Solution with token generation and token refreshment as Solution</p>
 
 
                 <div className="w-[89vw] h-[40vw] bg-black mt-20 rounded-2xl ">
