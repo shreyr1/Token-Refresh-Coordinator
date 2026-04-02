@@ -1,7 +1,3 @@
-
-
-
-
 import { Router } from "express";
 import { body } from "express-validator";
 import * as userController from '../controllers/user.Controller.js'
@@ -21,7 +17,10 @@ router.post('/login',
     userController.loginController
 )
 
-router.get('/dashboard', authentication.authUser ,userController.getUserInfo)
-router.get('/all-users', authentication.authUser, userController.getAllUsersController)
+router.post('/refresh', userController.refreshTokenController);
+router.post('/logout', authentication.authUser, userController.logoutController);
+
+router.get('/dashboard', authentication.authUser ,userController.getUserInfo);
+
 
 export default router;
