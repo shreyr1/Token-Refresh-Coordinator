@@ -27,7 +27,7 @@ export const AuthProvider = ({ children }) => {
                 toast.success("Login Successful");
                 setUser(res.data.user);
                 localStorage.setItem("user", JSON.stringify(res.data.user));
-                localStorage.setItem("token", res.data.token);
+                localStorage.setItem("token", res.data.accessToken);
                 
                 
                 if (res.data.user.role === "Admin") {
