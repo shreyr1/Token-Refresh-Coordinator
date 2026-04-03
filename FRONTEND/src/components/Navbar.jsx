@@ -16,7 +16,11 @@ const Navbar = () => {
           to="/"
           className="text-2xl font-bold text-white shrink-0"
         >
-          <img src={AutheImage} alt="Authē Logo" className="h-8 w-auto" />
+          <img
+            src={AutheImage}
+            alt="Authē Logo"
+            className="brand-logo"
+          />
         </Link>
 
         <div className="hidden md:flex items-center gap-8 text-sm font-medium text-zinc-400">

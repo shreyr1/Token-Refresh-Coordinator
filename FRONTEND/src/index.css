@@ -74,3 +74,230 @@ h6 {
   background-size: 200% 200%;
   animation: gradientMove 8s ease infinite;
 }
+
+/* Reusable responsive utility classes (apply these in JSX files as needed). */
+:root {
+  --page-max-width: 1200px;
+  --page-padding-x: clamp(0.9rem, 2vw, 1.5rem);
+  --section-gap: clamp(1rem, 2vw, 2rem);
+  --radius-md: 0.75rem;
+}
+
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+img,
+video,
+canvas,
+svg {
+  max-width: 100%;
+  height: auto;
+}
+
+.page-container,
+.resp-page {
+  width: min(100%, var(--page-max-width));
+  margin-inline: auto;
+  padding-inline: var(--page-padding-x);
+}
+
+.section-space,
+.resp-section {
+  padding-block: clamp(2rem, 5vw, 5rem);
+}
+
+.stack,
+.resp-stack {
+  display: flex;
+  flex-direction: column;
+  gap: var(--section-gap);
+}
+
+.row,
+.resp-row {
+  display: flex;
+  align-items: center;
+  gap: var(--section-gap);
+}
+
+.wrap,
+.resp-wrap {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--section-gap);
+}
+
+.grid-2,
+.resp-grid-2 {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--section-gap);
+}
+
+.grid-3,
+.resp-grid-3 {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: var(--section-gap);
+}
+
+.card-box,
+.resp-card {
+  width: 100%;
+  border-radius: var(--radius-md);
+  padding: clamp(0.9rem, 2.2vw, 1.5rem);
+}
+
+.w-full,
+.resp-w-full {
+  width: 100%;
+}
+
+.max-w-md,
+.resp-max-w-md {
+  max-width: 32rem;
+}
+
+.max-w-lg,
+.resp-max-w-lg {
+  max-width: 40rem;
+}
+
+.max-w-xl,
+.resp-max-w-xl {
+  max-width: 48rem;
+}
+
+.text-fluid-xl,
+.resp-text-fluid-xl {
+  font-size: clamp(1.5rem, 4vw, 3rem);
+  line-height: 1.15;
+}
+
+.text-fluid-lg,
+.resp-text-fluid-lg {
+  font-size: clamp(1.125rem, 2.5vw, 1.75rem);
+  line-height: 1.3;
+}
+
+.text-fluid-md,
+.resp-text-fluid-md {
+  font-size: clamp(0.95rem, 2vw, 1.125rem);
+  line-height: 1.5;
+}
+
+.gap-sm,
+.resp-gap-sm {
+  gap: 0.5rem;
+}
+
+.gap-md,
+.resp-gap-md {
+  gap: 1rem;
+}
+
+.gap-lg,
+.resp-gap-lg {
+  gap: 1.5rem;
+}
+
+.p-sm,
+.resp-p-sm {
+  padding: 0.75rem;
+}
+
+.p-md,
+.resp-p-md {
+  padding: 1rem;
+}
+
+.p-lg,
+.resp-p-lg {
+  padding: 1.5rem;
+}
+
+.px-page,
+.resp-px-page {
+  padding-inline: var(--page-padding-x);
+}
+
+.hide-mobile,
+.resp-hide-mobile {
+  display: initial;
+}
+
+.show-mobile,
+.resp-show-mobile {
+  display: none;
+}
+
+.overflow-x-auto,
+.resp-overflow-x-auto {
+  overflow-x: auto;
+}
+
+.break-word,
+.resp-break-word {
+  overflow-wrap: anywhere;
+  word-break: break-word;
+}
+
+.brand-logo {
+  height: clamp(2.1rem, 3vw, 3rem);
+  width: auto;
+  max-width: min(42vw, 220px);
+  object-fit: contain;
+  display: block;
+}
+
+@media (max-width: 1024px) {
+  .grid-3,
+  .resp-grid-3 {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 768px) {
+  .row,
+  .resp-row {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .grid-2,
+  .resp-grid-2,
+  .grid-3,
+  .resp-grid-3 {
+    grid-template-columns: 1fr;
+  }
+
+  .hide-mobile,
+  .resp-hide-mobile {
+    display: none !important;
+  }
+
+  .show-mobile,
+  .resp-show-mobile {
+    display: initial !important;
+  }
+
+  .p-lg,
+  .resp-p-lg {
+    padding: 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .section-space,
+  .resp-section {
+    padding-block: 1.5rem;
+  }
+
+  .text-fluid-xl,
+  .resp-text-fluid-xl {
+    line-height: 1.2;
+  }
+}

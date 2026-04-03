@@ -60,7 +60,6 @@ const UserDashboard = () => {
 
                     </div>
 
-                    {}
                     <div className="mt-8 pt-6 border-t border-white/10">
                         <p className="text-xs text-gray-500 mb-2">Token</p>
                         <p className="text-xs text-gray-400 break-all leading-relaxed">
