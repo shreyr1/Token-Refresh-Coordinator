@@ -7,28 +7,35 @@ import { Link } from 'react-router-dom'
 const AdminDashboard = () => {
     const { user, logout } = useAuth();
     const [users, setUsers] = useState([]);
+    const [rotationLog, setRotationLog] = useState("");
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchAllUsers = async () => {
+        const fetchAdminData = async () => {
             try {
                 const token = localStorage.getItem("token");
-                const res = await axios.get("http://localhost:5000/users/all-users", {
-                    headers: { Authorization: `Bearer ${token}` }
-                });
-                setUsers(res.data.users);
+                const [usersRes, logRes] = await Promise.all([
+                    axios.get("http://localhost:5000/users/all-users", {
+                        headers: { Authorization: `Bearer ${token}` }
+                    }),
+                    axios.get("http://localhost:5000/users/rotation-log", {
+                        headers: { Authorization: `Bearer ${token}` }
+                    })
+                ]);
+                setUsers(usersRes.data.users);
+                setRotationLog(logRes.data.log);
             } catch (error) {
                 console.error(error);
-                toast.error("Failed to fetch user database");
+                toast.error("Failed to fetch admin dashboard data");
             } finally {
                 setLoading(false);
             }
         };
-        fetchAllUsers();
+        fetchAdminData();
     }, []);
 
     return (
-        <div className="min-h-screen bg-[#0d0d0d] text-[#ececec] font-sans">
+        <div className="min-h-screen bg-[#0d0d0d] text-[#ececec] font-sans pb-20">
             <nav className="h-16 border-b border-zinc-800 flex items-center justify-between px-8 bg-black">
                 <div className='text-white uppercase text-sm font-bold flex items-center gap-10'>
                 <Link to="/" className='text-yellow-100'>Home</Link>
@@ -54,7 +61,7 @@ const AdminDashboard = () => {
                     <p className="text-zinc-500 text-sm">Manage and monitor all registered accounts within the system.</p>
                 </header>
 
-                <div className="bg-[#141414] border border-zinc-800 overflow-hidden ">
+                <div className="bg-[#141414] border border-zinc-800 overflow-hidden mb-16">
                     <div className="overflow-x-auto">
                         <table className="w-full text-left border-collapse">
                             <thead>
@@ -100,8 +107,18 @@ const AdminDashboard = () => {
                     </div>
                 </div>
 
+                <header className="mb-8">
+                    <h2 className="text-3xl font-bold text-white mb-2 tracking-tight">Key Rotation History</h2>
+                    <p className="text-zinc-500 text-sm">Review the cryptographic evolution and scheduled rotation events.</p>
+                </header>
+
+                <div className="bg-[#141414] border border-zinc-800 p-8 overflow-hidden">
+                    <pre className="text-xs text-zinc-400 font-mono leading-relaxed whitespace-pre-wrap">
+                        {rotationLog || (loading ? "Retrieving rotation logs..." : "No rotation history available.")}
+                    </pre>
+                </div>
+
                 <footer className="mt-8 flex items-center justify-between text-[10px] text-white uppercase tracking-widest font-bold">
-        
                     <div className=''>Total Records: {users.length}</div>
                 </footer>
             </main>
