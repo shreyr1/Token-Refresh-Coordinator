@@ -66,3 +66,15 @@ git add "$ROTATION_FILE"
 git commit -m "signing keys rotated successfully"
 
 echo "Rotation logged in git."
+
+# 5. Automatically restart the backend via PM2
+if command -v pm2 &> /dev/null; then
+    if pm2 list | grep -q "backend"; then
+        echo "Detected PM2 'backend' process. Restarting to apply new keys..."
+        pm2 restart backend
+    else
+        echo "PM2 is installed, but no 'backend' process was found."
+    fi
+else
+    echo "PM2 not found. Please restart your backend server manually to apply changes."
+fi
