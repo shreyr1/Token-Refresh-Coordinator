@@ -10,13 +10,6 @@ if ! command -v openssl &> /dev/null; then
     exit 1
 fi
 
-# 1. Rotate existing keys (Point 5 preparation - optional but good practice)
-# We can move current to previous if we want to implement Point 5 later.
-# For now, let's just implement Point 2: Generate new JWT_ACCESS_SECRET and JWT_REFRESH_SECRET.
-
-NEW_ACCESS_SECRET=$(openssl rand -hex 32)
-NEW_REFRESH_SECRET=$(openssl rand -hex 32)
-
 # Function to update or append values in .env
 update_env() {
     local key=$1
@@ -32,6 +25,20 @@ update_env() {
 if [ ! -f "$ENV_FILE" ]; then
     touch "$ENV_FILE"
 fi
+
+# 1. Rotate existing keys (Point 5: Sliding window)
+# Move current keys to PREVIOUS before generating NEW
+CURRENT_ACCESS=$(grep "^JWT_ACCESS_SECRET=" "$ENV_FILE" | cut -d"=" -f2- | sed "s/^['\"]*//;s/['\"]*$//" || echo "")
+CURRENT_REFRESH=$(grep "^JWT_REFRESH_SECRET=" "$ENV_FILE" | cut -d"=" -f2- | sed "s/^['\"]*//;s/['\"]*$//" || echo "")
+
+if [ -n "$CURRENT_ACCESS" ]; then
+    echo "Archiving current keys to PREVIOUS..."
+    update_env "JWT_PREVIOUS_ACCESS_SECRET" "$CURRENT_ACCESS"
+    update_env "JWT_PREVIOUS_REFRESH_SECRET" "$CURRENT_REFRESH"
+fi
+
+NEW_ACCESS_SECRET=$(openssl rand -hex 32)
+NEW_REFRESH_SECRET=$(openssl rand -hex 32)
 
 echo "Rotating keys..."
 update_env "JWT_ACCESS_SECRET" "$NEW_ACCESS_SECRET"

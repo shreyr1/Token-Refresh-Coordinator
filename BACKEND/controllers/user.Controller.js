@@ -1,9 +1,14 @@
-
 import { validationResult } from 'express-validator';
 import * as userServices from '../services/user.services.js';
 import userModel from '../models/user.model.js';
 import jwt, { decode } from "jsonwebtoken";
 import user from '../models/user.model.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 const refreshCookieOptions = {
     httpOnly: true,
@@ -85,9 +90,6 @@ export const getUserInfo = async(req, res) => {
 
 export const getAllUsersController = async (req, res) => {
     try {
-        if (req.user.role !== 'Admin') {
-            return res.status(403).json({ error: "Access denied. Admins only." });
-        }
         const users = await userModel.find({});
         res.status(200).json({ users });
     } catch (error) {
@@ -103,10 +105,17 @@ export const refreshTokenController = async(req, res) => {
     let decoded;
     try {
         decoded = jwt.verify(incoming, process.env.JWT_REFRESH_SECRET);
-
-        
-    } catch {
-        return res.status(401).json({error : "Invalid refresh token"});
+    } catch (err) {
+        // Point 5: Sliding window - fall back to previous secret for refresh token
+        if (process.env.JWT_PREVIOUS_REFRESH_SECRET) {
+            try {
+                decoded = jwt.verify(incoming, process.env.JWT_PREVIOUS_REFRESH_SECRET);
+            } catch (prevErr) {
+                return res.status(401).json({error : "Invalid refresh token"});
+            }
+        } else {
+            return res.status(401).json({error : "Invalid refresh token"});
+        }
     }
 
     const existingUser = await userModel.findById(decoded.id).select("+refreshToken");
@@ -135,4 +144,18 @@ export const logoutController = async(req, res) => {
 
     res.clearCookie("refreshToken", refreshCookieOptions);
     return res.status(200).json({ message : "Logged out"});
+};
+
+export const getRotationLog = async (req, res) => {
+    try {
+        const filePath = path.join(__dirname, '..', '..', 'ROTATION.md');
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: "Rotation log not found" });
+        }
+        const data = fs.readFileSync(filePath, 'utf8');
+        res.status(200).json({ log: data });
+    } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: "Failed to fetch rotation log" });
+    }
 };

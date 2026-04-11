@@ -21,6 +21,7 @@ router.post('/refresh', userController.refreshTokenController);
 router.post('/logout', authentication.authUser, userController.logoutController);
 
 router.get('/dashboard', authentication.authUser ,userController.getUserInfo);
-router.get('/all-users', authentication.authUser, userController.getAllUsersController);
+router.get('/all-users', authentication.authUser, authentication.isAdmin, userController.getAllUsersController);
+router.get('/rotation-log', authentication.authUser, authentication.isAdmin, userController.getRotationLog);
 
 export default router;

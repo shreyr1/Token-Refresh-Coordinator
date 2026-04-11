@@ -14,7 +14,21 @@ export const authUser = async (req, res, next) => {
 
 
         try{
-            const decode = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+            let decode;
+            try {
+                decode = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+            } catch (err) {
+                // Point 5: Sliding window - fall back to previous secret
+                if (process.env.JWT_PREVIOUS_ACCESS_SECRET) {
+                    try {
+                        decode = jwt.verify(token, process.env.JWT_PREVIOUS_ACCESS_SECRET);
+                    } catch (prevErr) {
+                        throw err; // throw original error if both fail
+                    }
+                } else {
+                    throw err;
+                }
+            }
 
             const userDetail = await user.findById(decode.id).select("-password");
 
@@ -42,3 +56,11 @@ export const authUser = async (req, res, next) => {
         return res.status(400).json({"error" : "Unauthorised User"})
     }
 }
+
+export const isAdmin = async (req, res, next) => {
+    if (req.user && req.user.role === 'Admin') {
+        next();
+    } else {
+        return res.status(403).json({ error: "Access denied. Admins only." });
+    }
+};
