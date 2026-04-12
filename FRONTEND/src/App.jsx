@@ -26,7 +26,7 @@ const AppContent = () => {
     { path: "/", element: <Home /> },
     { path: "/login", element: <Login /> },
     { path: "/signup", element: <Signup /> },
-    
+
     {
       path: "/admin",
       element: (
@@ -36,7 +36,7 @@ const AppContent = () => {
       )
     },
     {
-      path: "/dashboard",
+      path: "/dashboard/*",
       element: (
         <ProtectedRoute role="User">
           <UserDashboard />
