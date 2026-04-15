@@ -12,11 +12,11 @@ const __dirname = path.dirname(__filename);
 
 const refreshCookieOptions = {
     httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+    secure: true, 
+    sameSite: "lax",
     maxAge: 7*24*60*60*1000,
     path: "/",
-    // domain: ".yourdomain.com" // UNCOMMENT THIS FOR SUBDOMAIN DEPLOYMENT
+    domain: ".tourntravels.online" 
 }
 
 const sendAuthResponse = async(account, res) => {

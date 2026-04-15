@@ -5,7 +5,7 @@ import { toast } from "react-hot-toast";
 
 const AuthContext = createContext();
 
-const API_URL = "http://localhost:5000/users";
+const API_URL = "https://tourntravels.online/users";
 
 export const AuthProvider = ({ children }) => {
     const [user, setUser] = useState(null);
@@ -32,7 +32,7 @@ export const AuthProvider = ({ children }) => {
                 
                 if (res.data.user.role === "Admin") {
                     // Redirect to the admin subdomain
-                    window.location.href = "http://admin.localhost:5174"; // Change this to your production URL later
+                    window.location.href = "https://admin.tourntravels.online"; 
                 } else {
                     navigate("/dashboard");
                 }

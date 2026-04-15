@@ -13,8 +13,8 @@ export const generateToken = (admin, res) => {
         maxAge: 7 * 24 * 60 * 60 * 1000, // ms
         httpOnly: true,
         sameSite: "lax",
-        secure: process.env.NODE_ENV === "production",
-        // domain: ".yourdomain.com" // UNCOMMENT THIS FOR SUBDOMAIN DEPLOYMENT
+        secure: true,
+        domain: ".tourntravels.online"
     });
 
     return token;
