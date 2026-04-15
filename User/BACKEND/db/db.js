@@ -1,13 +1,12 @@
 import mongoose from "mongoose";
 import 'dotenv/config'
-function connect() {
-    
-    mongoose.connect(process.env.MONGODB_URI).then(() => {
-        // .then() runs when the promise is successfully resolved asynchronously
+async function connect() {
+    try{
+        await mongoose.connect(process.env.MONGODB_URI);
         console.log("Connected to MongoDB");
-    }).catch(err => {
+    }cathc(err){
         console.log(err);
-    })
+    }
 }
 
 export default connect;
