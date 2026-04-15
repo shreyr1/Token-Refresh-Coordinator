@@ -4,6 +4,12 @@ import userModel from '../../../BACKEND/models/user.model.js';
 import adminModel from '../models/admin.model.js';
 import { createAdmin } from '../services/admin.services.js';
 import { generateToken } from '../lib/utils.js';
+import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
 export const createAdminController = async(req, res) => {
     const errors = validationResult(req);
@@ -46,7 +52,7 @@ export const loginController = async(req , res) => {
             })
         }
 
-        generateToken(admin._id, res);
+        generateToken(admin, res);
 
         return res.status(200).json({ status : "login"});
     }catch(err){
@@ -72,8 +78,22 @@ export const getAllUsersController = async (req, res) => {
         }
         const users = await userModel.find({});
         res.status(200).json({ users });
-    } catch (error) {
+        } catch (error) {
         console.log(error.message);
         res.status(500).json({ error: "Failed to fetch users" });
-    }
-};
+        }
+        };
+
+        export const getRotationLog = async (req, res) => {
+        try {
+        const filePath = path.join(__dirname, '..', '..', '..', 'ROTATION.md');
+        if (!fs.existsSync(filePath)) {
+            return res.status(404).json({ error: "Rotation log not found" });
+        }
+        const data = fs.readFileSync(filePath, 'utf8');
+        res.status(200).json({ log: data });
+        } catch (error) {
+        console.log(error.message);
+        res.status(500).json({ error: "Failed to fetch rotation log" });
+        }
+        };

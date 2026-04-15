@@ -2,7 +2,7 @@
 set -e
 
 # Configuration
-ENV_FILE="BACKEND/.env"
+ENV_FILE=".env"
 
 # Ensure openssl is available
 if ! command -v openssl &> /dev/null; then
@@ -23,7 +23,8 @@ update_env() {
 
 # Ensure .env exists
 if [ ! -f "$ENV_FILE" ]; then
-    touch "$ENV_FILE"
+    echo "Error: $ENV_FILE not found."
+    exit 1
 fi
 
 # 1. Rotate existing keys (Point 5: Sliding window)
@@ -69,12 +70,8 @@ echo "Rotation logged in git."
 
 # 5. Automatically restart the backend via PM2
 if command -v pm2 &> /dev/null; then
-    if pm2 list | grep -q "backend"; then
-        echo "Detected PM2 'backend' process. Restarting to apply new keys..."
-        pm2 restart backend
-    else
-        echo "PM2 is installed, but no 'backend' process was found."
-    fi
+    echo "Attempting to restart backend processes..."
+    pm2 restart all || echo "PM2 failed to restart. Ensure processes are running."
 else
-    echo "PM2 not found. Please restart your backend server manually to apply changes."
+    echo "PM2 not found. Please restart your backend servers manually to apply changes."
 fi

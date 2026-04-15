@@ -1,8 +1,8 @@
 import { validationResult } from 'express-validator';
 import * as userServices from '../services/user.services.js';
 import userModel from '../models/user.model.js';
+import adminModel from '../models/admin.model.js';
 import jwt, { decode } from "jsonwebtoken";
-import user from '../models/user.model.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -16,17 +16,24 @@ const refreshCookieOptions = {
     sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
     maxAge: 7*24*60*60*1000,
     path: "/",
+    // domain: ".yourdomain.com" // UNCOMMENT THIS FOR SUBDOMAIN DEPLOYMENT
 }
 
-const sendAuthResponse = async(user, res) => {
-    const accessToken = user.generateAccessToken();
-    const refreshToken = user.generateRefreshToken();
+const sendAuthResponse = async(account, res) => {
+    const accessToken = account.generateAccessToken();
+    const refreshToken = account.generateRefreshToken();
 
-    await userModel.findByIdAndUpdate(user._id, { refreshToken });
-    if(user._doc?.password) delete user._doc.password;
+    // Dynamically update based on which model we are using
+    if (account.constructor.modelName === 'user') {
+        await userModel.findByIdAndUpdate(account._id, { refreshToken });
+    } else {
+        await adminModel.findByIdAndUpdate(account._id, { refreshToken });
+    }
+    
+    if(account._doc?.password) delete account._doc.password;
 
     res.cookie("refreshToken", refreshToken, refreshCookieOptions);
-    return res.status(200).json({user, accessToken});
+    return res.status(200).json({user: account, accessToken});
 
 };
 
@@ -60,14 +67,21 @@ export const loginController = async (req, res) => {
 
         const {email, password} = req.body;
 
-        const user = await userModel.findOne({email}).select('+password');
-        if(!user){
+        // Try to find in User collection first
+        let account = await userModel.findOne({email}).select('+password');
+        
+        // If not found in User, try Admin collection
+        if (!account) {
+            account = await adminModel.findOne({email}).select('+password');
+        }
+
+        if(!account){
             return res.status(401).json({
                 "error" : "Invalid Credentials"
             })
         }
 
-        const isMatch = await user.isValidPassword(password);
+        const isMatch = await account.isValidPassword(password);
 
         if(!isMatch){
             return res.status(401).json({
@@ -75,10 +89,10 @@ export const loginController = async (req, res) => {
             })
         }
 
-        return sendAuthResponse(user, res);
+        return sendAuthResponse(account, res);
 
     }catch(err){
-        return res.status(400).json({error : "Envalid User"})
+        return res.status(400).json({error : "Invalid User"})
     }
 };
 
@@ -118,26 +132,34 @@ export const refreshTokenController = async(req, res) => {
         }
     }
 
-    const existingUser = await userModel.findById(decoded.id).select("+refreshToken");
-    if(!existingUser || existingUser.refreshToken !== incoming){
+    // Try finding the user in both collections
+    let existingAccount = await userModel.findById(decoded.id).select("+refreshToken");
+    if (!existingAccount) {
+        existingAccount = await adminModel.findById(decoded.id).select("+refreshToken");
+    }
+
+    if(!existingAccount || existingAccount.refreshToken !== incoming){
         return res.status(401).json({error : "Refresh token mismatch"});
     }
 
-    if(decoded.tokenVersion !== existingUser.tokenVersion){
+    if(decoded.tokenVersion !== existingAccount.tokenVersion){
         return res.status(401).json({error: "Session invalidated. Login again."});
     }
 
-    const newAccessToken = existingUser.generateAccessToken();
-    const newRefreshToken = existingUser.generateRefreshToken();
-    existingUser.refreshToken = newRefreshToken;
-    await existingUser.save();  // updating mongodb with newRefreshToken.
+    const newAccessToken = existingAccount.generateAccessToken();
+    const newRefreshToken = existingAccount.generateRefreshToken();
+    existingAccount.refreshToken = newRefreshToken;
+    await existingAccount.save();
 
     res.cookie("refreshToken", newRefreshToken, refreshCookieOptions);
     return res.status(200).json({accessToken : newAccessToken});
 };
 
 export const logoutController = async(req, res) => {
-    await userModel.findByIdAndUpdate(req.user._id, {
+    // Determine which model to use
+    const model = req.user.role === 'Admin' ? adminModel : userModel;
+    
+    await model.findByIdAndUpdate(req.user._id, {
         $set: { refreshToken: null},
         $inc: { tokenVersion: 1},
     });
@@ -148,7 +170,7 @@ export const logoutController = async(req, res) => {
 
 export const getRotationLog = async (req, res) => {
     try {
-        const filePath = path.join(__dirname, '..', '..', 'ROTATION.md');
+        const filePath = path.join(__dirname, '..', '..', '..', 'ROTATION.md');
         if (!fs.existsSync(filePath)) {
             return res.status(404).json({ error: "Rotation log not found" });
         }

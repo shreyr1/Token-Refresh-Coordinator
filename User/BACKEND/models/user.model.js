@@ -1,5 +1,7 @@
 import mongoose from 'mongoose';
- 
+import jwt from 'jsonwebtoken';
+import bcrypt from 'bcrypt';
+
 const userSchema = new mongoose.Schema({
     name : {
         type: String,
@@ -37,6 +39,30 @@ const userSchema = new mongoose.Schema({
         default: 0,
     },
 })
+
+userSchema.statics.hashPassword = async function(password) {
+    return await bcrypt.hash(password, 10);
+};
+
+userSchema.methods.isValidPassword = async function(password) {
+    return await bcrypt.compare(password, this.password);
+};
+
+userSchema.methods.generateAccessToken = function() {
+    return jwt.sign(
+        { id: this._id, email: this.email, role: this.role, tokenVersion: this.tokenVersion },
+        process.env.JWT_ACCESS_SECRET,
+        { expiresIn: '15m' }
+    );
+};
+
+userSchema.methods.generateRefreshToken = function() {
+    return jwt.sign(
+        { id: this._id, tokenVersion: this.tokenVersion },
+        process.env.JWT_REFRESH_SECRET,
+        { expiresIn: '7d' }
+    );
+};
 
 const user = mongoose.model('user' , userSchema);
 

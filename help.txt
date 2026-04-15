@@ -1,0 +1,22 @@
+
+1. "Express detects expiration and triggers refresh transparently"
+You have: Frontend must manually call /refresh endpoint
+Missing:  A middleware that auto-detects 401 + expired, 
+          calls refresh, retries original request — transparently
+2. "Shell scripts rotate signing keys regularly"
+You have: Nothing
+Missing:  A shell script like rotate-keys.sh that generates 
+          new JWT_ACCESS_SECRET and JWT_REFRESH_SECRET
+3. "Unix cron triggers scheduled key rotations"
+You have: Nothing
+Missing:  A crontab entry that runs rotate-keys.sh 
+          on a schedule e.g. every 30 days
+4. "Git tracks key evolution and rotation history"
+You have: Nothing
+Missing:  The shell script should git commit after 
+          each rotation so history is tracked
+5. "Sliding window — old keys work alongside new keys"
+You have: Only one signing key at a time
+Missing:  Your app needs to store CURRENT and PREVIOUS key,
+          try verifying with current key first, 
+          fall back to previous key if it fails

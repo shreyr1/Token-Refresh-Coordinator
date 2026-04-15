@@ -13,12 +13,30 @@ export const authAdmin = async(req, res , next) => {
         }
 
         try {
-            const decode = jwt.verify(token, process.env.JWT_SECRET);
+            let decode;
+            try {
+                decode = jwt.verify(token, process.env.JWT_ACCESS_SECRET);
+            } catch (err) {
+                // Point 5: Sliding window - fall back to previous secret
+                if (process.env.JWT_PREVIOUS_ACCESS_SECRET) {
+                    try {
+                        decode = jwt.verify(token, process.env.JWT_PREVIOUS_ACCESS_SECRET);
+                    } catch (prevErr) {
+                        throw err; // throw original error if both fail
+                    }
+                } else {
+                    throw err;
+                }
+            }
 
-            const adminDetail = await admin.findById(decode.adminId).select("-password"); 
+            const adminDetail = await admin.findById(decode.id).select("-password"); 
 
             if(!adminDetail){
                 return res.status(401).json({"error" : "User Not Found"});
+            }
+
+            if(decode.tokenVersion !== adminDetail.tokenVersion){
+                return res.status(401).json({ error : "Session invalidated. Login again."});
             }
 
             req.admin = adminDetail;
