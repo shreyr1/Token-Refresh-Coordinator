@@ -70,8 +70,8 @@ echo "Rotation logged in git."
 # 5. Automatically restart the backends via PM2
 if command -v pm2 &> /dev/null; then
     echo "Restarting both backends to apply new keys..."
-    pm2 restart admin-backend || echo "Admin backend not found in PM2."
-    pm2 restart user-backend || echo "User backend not found in PM2."
+    pm2 restart admin-backend --update-env || echo "Admin backend not found in PM2."
+    pm2 restart user-backend --update-env || echo "User backend not found in PM2."
 else
     echo "PM2 not found. Please restart your backend servers manually to apply changes."
 fi
