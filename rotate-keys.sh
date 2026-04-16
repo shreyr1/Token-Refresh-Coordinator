@@ -2,7 +2,7 @@
 set -e
 
 # Configuration
-ENV_FILE="BACKEND/.env"
+ENV_FILE=".env"
 
 # Ensure openssl is available
 if ! command -v openssl &> /dev/null; then
@@ -67,14 +67,11 @@ git commit -m "signing keys rotated successfully"
 
 echo "Rotation logged in git."
 
-# 5. Automatically restart the backend via PM2
+# 5. Automatically restart the backends via PM2
 if command -v pm2 &> /dev/null; then
-    if pm2 list | grep -q "backend"; then
-        echo "Detected PM2 'backend' process. Restarting to apply new keys..."
-        pm2 restart backend
-    else
-        echo "PM2 is installed, but no 'backend' process was found."
-    fi
+    echo "Restarting both backends to apply new keys..."
+    pm2 restart admin-backend || echo "Admin backend not found in PM2."
+    pm2 restart user-backend || echo "User backend not found in PM2."
 else
-    echo "PM2 not found. Please restart your backend server manually to apply changes."
+    echo "PM2 not found. Please restart your backend servers manually to apply changes."
 fi
