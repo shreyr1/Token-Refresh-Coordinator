@@ -2,7 +2,6 @@ import { validationResult } from 'express-validator';
 import * as userServices from '../services/user.services.js';
 import userModel from '../models/user.model.js';
 import jwt, { decode } from "jsonwebtoken";
-import user from '../models/user.model.js';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -78,7 +77,7 @@ export const loginController = async (req, res) => {
         return sendAuthResponse(user, res);
 
     }catch(err){
-        return res.status(400).json({error : "Envalid User"})
+        return res.status(400).json({error : "Invalid User"})
     }
 };
 

@@ -6,6 +6,7 @@ import * as authentication from '../middleware/auth.middleware.js'
 const router = Router();
 
 router.post('/register',
+    body('name').notEmpty().withMessage('Name is required'),
     body('email').isEmail().withMessage('Email must be a valid email address'),
     body('password').isLength({min : 6}).withMessage('password must be at least 6 character long'),
     userController.createUserController);
