@@ -6,10 +6,6 @@ import * as authentication from '../middleware/auth.middleware.js'
 
 const router = Router();
 
-router.post('/register', 
-    body('email').isEmail().withMessage("Email must bge a valid Admin email Id"),
-    body('password').isLength({min : 6}).withMessage('password must be correct and Atleast 6 digit'),
-    adminController.createAdminController);
 
 router.post('/login', 
     body('email').isEmail().withMessage("Email must bge a valid Admin email Id"),
@@ -20,7 +16,7 @@ router.post('/login',
 router.post('/logout',authentication.authAdmin, adminController.logoutController);
 
 
-router.get('/dashboard', authentication.authAdmin,  adminController.getAllUsersController);
+router.get('/users', authentication.authAdmin,  adminController.getAllUsersController);
 
 
 export default router;

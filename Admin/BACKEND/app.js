@@ -3,7 +3,7 @@ import morgan from 'morgan'
 import connect from './DB/db.js'
 import cors from 'cors'
 import cookieParser from 'cookie-parser'
-import adminRoutes from './routes/adming.routes.js'
+import adminRoutes from './routes/admin.routes.js'
 
 
 connect()
@@ -11,7 +11,7 @@ connect()
 const app = express();
 
 app.use(cors({
-    origin: "http://localhost:5174",
+    origin: ["http://localhost:5173", "http://localhost:5174"],
     credentials: true
 }));
 
