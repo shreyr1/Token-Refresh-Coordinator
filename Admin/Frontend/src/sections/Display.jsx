@@ -9,7 +9,7 @@ const Display = () => {
         const fetchUsers = async () => {
             try {
                 const response = await axios.get(
-                    "/admin/users",
+                    "http://localhost:3001/admin/users",
                     {
                         headers: {
                             Authorization: `Bearer ${localStorage.getItem("token")}`,
@@ -24,7 +24,7 @@ const Display = () => {
 
         const fetchLog = async () => {
             try {
-                const response = await axios.get("/admin/rotation-log", {
+                const response = await axios.get("http://localhost:3001/admin/rotation-log", {
                     headers: { Authorization: `Bearer ${localStorage.getItem("token")}` }
                 });
                 setLog(response.data.log);
