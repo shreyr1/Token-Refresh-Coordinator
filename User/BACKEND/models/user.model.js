@@ -38,6 +38,8 @@ const userSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+},{
+ timestamps : true
 })
 
 userSchema.statics.hashPassword = async function(password){
